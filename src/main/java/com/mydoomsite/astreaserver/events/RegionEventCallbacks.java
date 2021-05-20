@@ -2,6 +2,7 @@ package com.mydoomsite.astreaserver.events;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.time.LocalDateTime;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.MinecraftServer;
@@ -14,6 +15,7 @@ import net.minecraftforge.eventbus.api.Event;
 import com.mydoomsite.astreaserver.datatypes.ProtectedRegion;
 import com.mydoomsite.astreaserver.helpers.ServerHelper;
 import com.mydoomsite.astreaserver.helpers.WorldHelper;
+import com.mydoomsite.astreaserver.lib.Constants;
 import com.mydoomsite.astreaserver.main.MainRegistry;
 import com.mydoomsite.astreaserver.main.RegionProtector;
 
@@ -37,9 +39,11 @@ public class RegionEventCallbacks
 					File regionsPath = ServerHelper.GetProtectedRegionsPath();
 					File logFile = new File(regionsPath, region.Name + ".log");
 					
+					String log = String.format("[%s] %s", LocalDateTime.now().format(Constants.DATE_TIME_FORMATTER), logMessage);
+					
 					try(FileWriter fw = new FileWriter(logFile, true))
 					{
-						fw.write(logMessage + System.lineSeparator());
+						fw.write(log + System.lineSeparator());
 					}
 				}
 				catch (Exception ex)

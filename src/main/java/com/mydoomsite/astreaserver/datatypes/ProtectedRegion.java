@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import com.mydoomsite.astreaserver.helpers.PlayerHelper;
+import com.mydoomsite.astreaserver.lib.Constants;
 import com.mydoomsite.astreaserver.main.MainRegistry;
 
 import net.minecraft.entity.player.PlayerEntity;
@@ -63,7 +64,7 @@ public class ProtectedRegion
 	
 	public ProtectedRegion(String name, Vector3i start, Vector3i end, int protectionLevel, UUID owner, UUID protector)
 	{
-		if(name == null || name.length() <= 0)  throw new IllegalArgumentException("Name cannot be null");
+		if(name == null || name.length() <= 0) throw new IllegalArgumentException("Name cannot be null");
 		if(start == null) throw new IllegalArgumentException("Start position cannot be null");
 		if(end == null)   throw new IllegalArgumentException("End position cannot be null");
 		
@@ -99,6 +100,9 @@ public class ProtectedRegion
 	
 	public boolean PlayerHasAccess(PlayerEntity player)
 	{
+		if(Constants.DEBUG)
+			return false;
+		
 		UUID uuid = player.getUUID();
 		return this.Owner.equals(uuid) || PlayerHelper.IsSuperAdmin(uuid) || this.TrustedPlayers.contains(uuid);
 	}
