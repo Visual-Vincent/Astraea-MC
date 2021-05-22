@@ -10,19 +10,19 @@ import com.mydoomsite.astreaserver.main.RegionProtector;
 
 public final class ServerEvents
 {
-	@SubscribeEvent
-	public void ServerStarted(final FMLServerStartedEvent event)
-	{
-		MinecraftServer server = event.getServer();
-		ServerWorld world = server.getLevel(World.OVERWORLD);
-		
-		try
-		{
-			RegionProtector.LoadProtectedRegions(world, true);
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
+    @SubscribeEvent
+    public void ServerStarted(final FMLServerStartedEvent event)
+    {
+        MinecraftServer server = event.getServer();
+        ServerWorld world = server.getLevel(World.OVERWORLD);
+        
+        try
+        {
+            RegionProtector.LoadProtectedRegions(world, true);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
 }

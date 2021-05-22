@@ -17,34 +17,34 @@ import com.mydoomsite.astreaserver.helpers.RegionHelper;
 
 public class EndProtectCommand
 {
-	private static final SimpleCommandExceptionType ERROR_NOT_DRAWING = new SimpleCommandExceptionType(new StringTextComponent("You are not drawing a region. Type /protectregion to start."));
-	
-	public static void register(CommandDispatcher<CommandSource> dispatcher)
-	{
-		dispatcher.register(
-			Commands.literal("endprotect")
-			.requires((cmdSource) -> {
-				return cmdSource.hasPermission(2);
-			}).executes((context) -> {
-				CommandSource src = context.getSource();
-				ServerWorld world = src.getLevel();
-				ServerPlayerEntity protector = src.getPlayerOrException();
-				
-				UUID protectorUuid = protector.getUUID();
-				Vector3d end = protector.position();
-				
-				ProtectedRegion region = RegionHelper.EndProtectRegion(world, end, protectorUuid);
-				if(region != null)
-				{
-					CommandHelper.LogCommandSuccess(src, "Protected region \u00A7a\"" + region.Name + "\"\u00A7r created successfully", true, true);
-				}
-				else
-				{
-					throw ERROR_NOT_DRAWING.create();
-				}
-				
-				return 1;
-			})
-		);
-	}
+    private static final SimpleCommandExceptionType ERROR_NOT_DRAWING = new SimpleCommandExceptionType(new StringTextComponent("You are not drawing a region. Type /protectregion to start."));
+    
+    public static void register(CommandDispatcher<CommandSource> dispatcher)
+    {
+        dispatcher.register(
+            Commands.literal("endprotect")
+            .requires((cmdSource) -> {
+                return cmdSource.hasPermission(2);
+            }).executes((context) -> {
+                CommandSource src = context.getSource();
+                ServerWorld world = src.getLevel();
+                ServerPlayerEntity protector = src.getPlayerOrException();
+                
+                UUID protectorUuid = protector.getUUID();
+                Vector3d end = protector.position();
+                
+                ProtectedRegion region = RegionHelper.EndProtectRegion(world, end, protectorUuid);
+                if(region != null)
+                {
+                    CommandHelper.LogCommandSuccess(src, "Protected region \u00A7a\"" + region.Name + "\"\u00A7r created successfully", true, true);
+                }
+                else
+                {
+                    throw ERROR_NOT_DRAWING.create();
+                }
+                
+                return 1;
+            })
+        );
+    }
 }

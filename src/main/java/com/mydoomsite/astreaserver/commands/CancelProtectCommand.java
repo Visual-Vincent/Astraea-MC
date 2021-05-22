@@ -14,30 +14,30 @@ import com.mydoomsite.astreaserver.helpers.RegionHelper;
 
 public class CancelProtectCommand
 {
-	private static final SimpleCommandExceptionType ERROR_NOT_DRAWING = new SimpleCommandExceptionType(new StringTextComponent("You are not drawing a region."));
-	
-	public static void register(CommandDispatcher<CommandSource> dispatcher)
-	{
-		dispatcher.register(
-			Commands.literal("cancelprotect")
-			.requires((cmdSource) -> {
-				return cmdSource.hasPermission(2);
-			}).executes((context) -> {
-				CommandSource src = context.getSource();
-				ServerPlayerEntity protector = src.getPlayerOrException();
-				UUID protectorUuid = protector.getUUID();
-				
-				if(RegionHelper.CancelProtectRegion(protectorUuid))
-				{
-					CommandHelper.LogCommandSuccess(src, "\u00A7aCancelled protected region drawing.", false, false);
-				}
-				else
-				{
-					throw ERROR_NOT_DRAWING.create();
-				}
-				
-				return 1;
-			})
-		);
-	}
+    private static final SimpleCommandExceptionType ERROR_NOT_DRAWING = new SimpleCommandExceptionType(new StringTextComponent("You are not drawing a region."));
+    
+    public static void register(CommandDispatcher<CommandSource> dispatcher)
+    {
+        dispatcher.register(
+            Commands.literal("cancelprotect")
+            .requires((cmdSource) -> {
+                return cmdSource.hasPermission(2);
+            }).executes((context) -> {
+                CommandSource src = context.getSource();
+                ServerPlayerEntity protector = src.getPlayerOrException();
+                UUID protectorUuid = protector.getUUID();
+                
+                if(RegionHelper.CancelProtectRegion(protectorUuid))
+                {
+                    CommandHelper.LogCommandSuccess(src, "\u00A7aCancelled protected region drawing.", false, false);
+                }
+                else
+                {
+                    throw ERROR_NOT_DRAWING.create();
+                }
+                
+                return 1;
+            })
+        );
+    }
 }

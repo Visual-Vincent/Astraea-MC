@@ -27,16 +27,16 @@ public final class PlayerEvents
         }
     }
     
-	@SubscribeEvent
-	public void OnDeathDrop(LivingDropsEvent event)
-	{
-		if(!(event.getEntityLiving() instanceof PlayerEntity))
-			return;
-		
-		Collection<ItemEntity> drops = event.getDrops();
-		for(ItemEntity item : drops)
-		{
-			item.lifespan = 10 * Constants.TICKS_MINUTE; // TODO: Add configuration file.
-		}
-	}
+    @SubscribeEvent
+    public void OnDeathDrop(LivingDropsEvent event)
+    {
+        if(!(event.getEntityLiving() instanceof PlayerEntity))
+            return;
+        
+        Collection<ItemEntity> drops = event.getDrops();
+        for(ItemEntity item : drops)
+        {
+            item.lifespan = 10 * Constants.TICKS_MINUTE; // TODO: Add configuration file.
+        }
+    }
 }

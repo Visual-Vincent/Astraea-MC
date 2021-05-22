@@ -26,29 +26,29 @@ import net.minecraftforge.fml.network.FMLNetworkConstants;
 @Mod(ReferenceStrings.MODID)
 public final class MainRegistry
 {
-	public static final Logger Logger = LogManager.getLogger(ReferenceStrings.MODID);
-	
-	public MainRegistry()
-	{
-		// Make sure that the client doesn't display the server as "Incompatible" since this mod is server-side only.
-		ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.DISPLAYTEST, () ->
-			Pair.of(() -> FMLNetworkConstants.IGNORESERVERONLY, (version, network) -> true)
-		);
-		
-		DistExecutor.unsafeRunWhenOn(Dist.DEDICATED_SERVER, () -> () -> {
-			FMLJavaModLoadingContext.get().getModEventBus().addListener(this::SetupDedicatedServer);
-		});
-	}
-	
-	private void SetupDedicatedServer(final FMLDedicatedServerSetupEvent event)
-	{
-	    BlockHelper.Init();
-	    
-		MinecraftForge.EVENT_BUS.register(new ServerEvents());
-		MinecraftForge.EVENT_BUS.register(new CommandEvents());
-		MinecraftForge.EVENT_BUS.register(new PlayerEvents());
-		MinecraftForge.EVENT_BUS.register(new BlockEvents());
+    public static final Logger Logger = LogManager.getLogger(ReferenceStrings.MODID);
+    
+    public MainRegistry()
+    {
+        // Make sure that the client doesn't display the server as "Incompatible" since this mod is server-side only.
+        ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.DISPLAYTEST, () ->
+            Pair.of(() -> FMLNetworkConstants.IGNORESERVERONLY, (version, network) -> true)
+        );
+        
+        DistExecutor.unsafeRunWhenOn(Dist.DEDICATED_SERVER, () -> () -> {
+            FMLJavaModLoadingContext.get().getModEventBus().addListener(this::SetupDedicatedServer);
+        });
+    }
+    
+    private void SetupDedicatedServer(final FMLDedicatedServerSetupEvent event)
+    {
+        BlockHelper.Init();
+        
+        MinecraftForge.EVENT_BUS.register(new ServerEvents());
+        MinecraftForge.EVENT_BUS.register(new CommandEvents());
+        MinecraftForge.EVENT_BUS.register(new PlayerEvents());
+        MinecraftForge.EVENT_BUS.register(new BlockEvents());
         MinecraftForge.EVENT_BUS.register(new ItemEvents());
-		MinecraftForge.EVENT_BUS.register(new PlayerHelper());
-	}
+        MinecraftForge.EVENT_BUS.register(new PlayerHelper());
+    }
 }

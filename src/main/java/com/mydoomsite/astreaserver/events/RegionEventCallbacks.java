@@ -20,69 +20,69 @@ import com.mydoomsite.astreaserver.main.RegionProtector;
 
 public class RegionEventCallbacks
 {
-	private static void RegionProcessEventCallback(Event event, ProtectedRegion region, String logMessage)
-	{
+    private static void RegionProcessEventCallback(Event event, ProtectedRegion region, String logMessage)
+    {
         if(event == null) throw new IllegalArgumentException("'event' cannot be null");
         if(region == null) throw new IllegalArgumentException("'region' cannot be null");
         if(logMessage == null) throw new IllegalArgumentException("'logMessage' cannot be null");
         
-		switch(region.ProtectionLevel)
-		{
-			case ProtectedRegion.PROTECTION_GRIEFING:
-				if(event.isCancelable())
-				{
-					event.setCanceled(true);
-					break;
-				}
-				// If canceling is not possible, fall-through to logging
-				
-			case ProtectedRegion.PROTECTION_LOGGING_ONLY:
-				try
-				{
-					File regionsPath = ServerHelper.GetProtectedRegionsPath();
-					File logFile = new File(regionsPath, region.Name + ".log");
-					
-					String log = String.format("[%s] %s", LocalDateTime.now().format(Constants.DATE_TIME_FORMATTER), logMessage);
-					
-					try(FileWriter fw = new FileWriter(logFile, true))
-					{
-						fw.write(log + System.lineSeparator());
-					}
-				}
-				catch (Exception ex)
-				{
-					String log = String.format("[%s] %s", region.Name, logMessage);
-					MainRegistry.Logger.info(log);
-					ex.printStackTrace();
-				}
-				break;
-		}
-	}
-	
-	public static void RegionDefaultEventCallback(Event event, IWorld world, PlayerEntity player, BlockPos position, String logMessage)
-	{
-		if(event == null) throw new IllegalArgumentException("'event' cannot be null");
-		if(world == null) throw new IllegalArgumentException("'world' cannot be null");
-		if(player == null) throw new IllegalArgumentException("'player' cannot be null");
-		if(position == null) throw new IllegalArgumentException("'position' cannot be null");
-		if(logMessage == null) throw new IllegalArgumentException("'logMessage' cannot be null");
-		
-		if(!WorldHelper.IsServerWorld(world))
-			return;
-		
-		ProtectedRegion region = RegionProtector.GetProtectedRegion((ServerWorld)world, position);
-		
-		if(region == null || region.PlayerHasAccess(player))
-			return;
-		
-		RegionProcessEventCallback(event, region, logMessage);
-	}
-	
-	public static void RegionDefaultEventCallback(Event event, IWorld world, PlayerEntity player, Vector3d position, String logMessage)
-	{
+        switch(region.ProtectionLevel)
+        {
+            case ProtectedRegion.PROTECTION_GRIEFING:
+                if(event.isCancelable())
+                {
+                    event.setCanceled(true);
+                    break;
+                }
+                // If canceling is not possible, fall-through to logging
+                
+            case ProtectedRegion.PROTECTION_LOGGING_ONLY:
+                try
+                {
+                    File regionsPath = ServerHelper.GetProtectedRegionsPath();
+                    File logFile = new File(regionsPath, region.Name + ".log");
+                    
+                    String log = String.format("[%s] %s", LocalDateTime.now().format(Constants.DATE_TIME_FORMATTER), logMessage);
+                    
+                    try(FileWriter fw = new FileWriter(logFile, true))
+                    {
+                        fw.write(log + System.lineSeparator());
+                    }
+                }
+                catch (Exception ex)
+                {
+                    String log = String.format("[%s] %s", region.Name, logMessage);
+                    MainRegistry.Logger.info(log);
+                    ex.printStackTrace();
+                }
+                break;
+        }
+    }
+    
+    public static void RegionDefaultEventCallback(Event event, IWorld world, PlayerEntity player, BlockPos position, String logMessage)
+    {
+        if(event == null) throw new IllegalArgumentException("'event' cannot be null");
+        if(world == null) throw new IllegalArgumentException("'world' cannot be null");
+        if(player == null) throw new IllegalArgumentException("'player' cannot be null");
+        if(position == null) throw new IllegalArgumentException("'position' cannot be null");
+        if(logMessage == null) throw new IllegalArgumentException("'logMessage' cannot be null");
+        
+        if(!WorldHelper.IsServerWorld(world))
+            return;
+        
+        ProtectedRegion region = RegionProtector.GetProtectedRegion((ServerWorld)world, position);
+        
+        if(region == null || region.PlayerHasAccess(player))
+            return;
+        
+        RegionProcessEventCallback(event, region, logMessage);
+    }
+    
+    public static void RegionDefaultEventCallback(Event event, IWorld world, PlayerEntity player, Vector3d position, String logMessage)
+    {
         if(position == null)
             throw new IllegalArgumentException("'position' cannot be null");
         
-		RegionDefaultEventCallback(event, world, player, new BlockPos(position), logMessage);
-	}
+        RegionDefaultEventCallback(event, world, player, new BlockPos(position), logMessage);
+    }
 }
