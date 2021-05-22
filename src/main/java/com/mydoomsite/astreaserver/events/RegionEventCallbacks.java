@@ -5,11 +5,10 @@ import java.io.FileWriter;
 import java.time.LocalDateTime;
 
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.eventbus.api.Event;
 
 import com.mydoomsite.astreaserver.datatypes.ProtectedRegion;
@@ -21,8 +20,12 @@ import com.mydoomsite.astreaserver.main.RegionProtector;
 
 public class RegionEventCallbacks
 {
-	public static void RegionDefaultEventCallback(Event event, ProtectedRegion region, String logMessage)
+	private static void RegionProcessEventCallback(Event event, ProtectedRegion region, String logMessage)
 	{
+        if(event == null) throw new IllegalArgumentException("'event' cannot be null");
+        if(region == null) throw new IllegalArgumentException("'region' cannot be null");
+        if(logMessage == null) throw new IllegalArgumentException("'logMessage' cannot be null");
+        
 		switch(region.ProtectionLevel)
 		{
 			case ProtectedRegion.PROTECTION_GRIEFING:
@@ -56,20 +59,30 @@ public class RegionEventCallbacks
 		}
 	}
 	
-	public static void RegionBlockEventCallback(BlockEvent event, IWorld world, PlayerEntity player, BlockPos blockPosition, String logMessage)
+	public static void RegionDefaultEventCallback(Event event, IWorld world, PlayerEntity player, BlockPos position, String logMessage)
 	{
-		if(world.isClientSide())
+		if(event == null) throw new IllegalArgumentException("'event' cannot be null");
+		if(world == null) throw new IllegalArgumentException("'world' cannot be null");
+		if(player == null) throw new IllegalArgumentException("'player' cannot be null");
+		if(position == null) throw new IllegalArgumentException("'position' cannot be null");
+		if(logMessage == null) throw new IllegalArgumentException("'logMessage' cannot be null");
+		
+		if(!WorldHelper.IsServerWorld(world))
 			return;
 		
-		MinecraftServer server = WorldHelper.GetWorldServer(world);
-		if(server == null)
-			return;
-		
-		ProtectedRegion region = RegionProtector.GetProtectedRegion((ServerWorld)world, blockPosition);
+		ProtectedRegion region = RegionProtector.GetProtectedRegion((ServerWorld)world, position);
 		
 		if(region == null || region.PlayerHasAccess(player))
 			return;
 		
-		RegionDefaultEventCallback(event, region, logMessage);
+		RegionProcessEventCallback(event, region, logMessage);
+	}
+	
+	public static void RegionDefaultEventCallback(Event event, IWorld world, PlayerEntity player, Vector3d position, String logMessage)
+	{
+        if(position == null)
+            throw new IllegalArgumentException("'position' cannot be null");
+        
+		RegionDefaultEventCallback(event, world, player, new BlockPos(position), logMessage);
 	}
 }

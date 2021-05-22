@@ -6,8 +6,10 @@ import org.apache.logging.log4j.Logger;
 
 import com.mydoomsite.astreaserver.events.BlockEvents;
 import com.mydoomsite.astreaserver.events.CommandEvents;
+import com.mydoomsite.astreaserver.events.ItemEvents;
 import com.mydoomsite.astreaserver.events.PlayerEvents;
 import com.mydoomsite.astreaserver.events.ServerEvents;
+import com.mydoomsite.astreaserver.helpers.BlockHelper;
 import com.mydoomsite.astreaserver.helpers.PlayerHelper;
 import com.mydoomsite.astreaserver.lib.ReferenceStrings;
 
@@ -40,10 +42,13 @@ public final class MainRegistry
 	
 	private void SetupDedicatedServer(final FMLDedicatedServerSetupEvent event)
 	{
+	    BlockHelper.Init();
+	    
 		MinecraftForge.EVENT_BUS.register(new ServerEvents());
 		MinecraftForge.EVENT_BUS.register(new CommandEvents());
-		MinecraftForge.EVENT_BUS.register(new BlockEvents());
 		MinecraftForge.EVENT_BUS.register(new PlayerEvents());
+		MinecraftForge.EVENT_BUS.register(new BlockEvents());
+        MinecraftForge.EVENT_BUS.register(new ItemEvents());
 		MinecraftForge.EVENT_BUS.register(new PlayerHelper());
 	}
 }

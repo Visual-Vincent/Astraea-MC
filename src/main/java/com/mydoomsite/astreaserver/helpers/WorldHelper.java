@@ -22,6 +22,16 @@ public final class WorldHelper
 		return ((ServerWorld)world).getServer();
 	}
 	
+	public static boolean IsServerWorld(IWorld world)
+	{
+		return world != null && !world.isClientSide() && world instanceof ServerWorld;
+	}
+	
+	public static boolean IsOverworld(World world)
+	{
+		return world.dimension().location().getPath() == Dimension.OVERWORLD.location().getPath();
+	}
+	
 	public static File GetServerPath(IWorld world)
 	{
 		if(world == null)
@@ -48,10 +58,5 @@ public final class WorldHelper
 	public static File GetProtectedRegionsPath(IWorld world) throws IOException
 	{
 		return ServerHelper.GetProtectedRegionsPath(WorldHelper.GetWorldServer(world));
-	}
-	
-	public static boolean IsOverworld(World world)
-	{
-		return world.dimension().location().getPath() == Dimension.OVERWORLD.location().getPath();
 	}
 }
