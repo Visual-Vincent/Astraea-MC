@@ -4,7 +4,6 @@ import com.mydoomsite.astreaserver.helpers.BlockHelper;
 import com.mydoomsite.astreaserver.helpers.WorldHelper;
 
 import net.minecraft.block.AbstractButtonBlock;
-import net.minecraft.block.AnvilBlock;
 import net.minecraft.block.BellBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.CraftingTableBlock;
@@ -88,7 +87,6 @@ public final class BlockEvents
             block instanceof CraftingTableBlock ||
             block instanceof AbstractButtonBlock ||
             block instanceof LeverBlock ||
-            block instanceof AnvilBlock ||
             block instanceof StonecutterBlock ||
             block instanceof BellBlock ||
             block instanceof EnderChestBlock
