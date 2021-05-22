@@ -7,7 +7,8 @@ import net.minecraft.block.Block;
 
 public final class BlockHelper
 {
-    private static final String USE_METHOD_NAME = "use";
+    private static final String USE_METHOD_NAME = "func_225533_a_";
+    private static final String USE_METHOD_DEBUG_NAME = "use";
     private static final Class<?>[] USE_METHOD_PARAMETER_TYPES;
     
     public static void Init() {};
@@ -17,7 +18,7 @@ public final class BlockHelper
         Class<?>[] parameterTypes = null;
         for(Method method : AbstractBlock.class.getMethods())
         {
-            if(method.getName() == USE_METHOD_NAME)
+            if(method.getName() == USE_METHOD_NAME || method.getName() == USE_METHOD_DEBUG_NAME)
             {
                 parameterTypes = method.getParameterTypes();
                 break;
