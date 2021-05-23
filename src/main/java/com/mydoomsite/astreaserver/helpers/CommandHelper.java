@@ -19,7 +19,7 @@ public final class CommandHelper
             String consoleText = text;
             try
             {
-                consoleText = "[" + src.getPlayerOrException().getName().getContents() + ": " + text + "]";
+                consoleText = "[" + src.getPlayerOrException().getName().getContents() + ": " + text + "\u00A7r]";
             }
             catch(Exception ex) {}
             
@@ -27,11 +27,11 @@ public final class CommandHelper
             MainRegistry.Logger.info(consoleText);
         }
         
-        src.sendSuccess(new StringTextComponent(text), informAdmins);
+        src.sendSuccess(new StringTextComponent(text + "\u00A7r"), informAdmins);
     }
     
     public static void LogCommandFailure(CommandSource src, String text)
     {
-        src.sendFailure(new StringTextComponent(text));
+        src.sendFailure(new StringTextComponent(text + "\u00A7r"));
     }
 }

@@ -14,7 +14,7 @@ import com.mydoomsite.astreaserver.helpers.RegionHelper;
 
 public class CancelProtectCommand
 {
-    private static final SimpleCommandExceptionType ERROR_NOT_DRAWING = new SimpleCommandExceptionType(new StringTextComponent("You are not drawing a region."));
+    private static final SimpleCommandExceptionType ERROR_NOT_DRAWING = new SimpleCommandExceptionType(new StringTextComponent("You are not drawing a region"));
     
     public static void register(CommandDispatcher<CommandSource> dispatcher)
     {
@@ -29,7 +29,7 @@ public class CancelProtectCommand
                 
                 if(RegionHelper.CancelProtectRegion(protectorUuid))
                 {
-                    CommandHelper.LogCommandSuccess(src, "\u00A7aCancelled protected region drawing.", false, false);
+                    CommandHelper.LogCommandSuccess(src, "\u00A7aCancelled protected region drawing", false, false);
                 }
                 else
                 {

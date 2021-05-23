@@ -17,7 +17,7 @@ import com.mydoomsite.astreaserver.helpers.RegionHelper;
 
 public class EndProtectCommand
 {
-    private static final SimpleCommandExceptionType ERROR_NOT_DRAWING = new SimpleCommandExceptionType(new StringTextComponent("You are not drawing a region. Type /protectregion to start."));
+    private static final SimpleCommandExceptionType ERROR_NOT_DRAWING = new SimpleCommandExceptionType(new StringTextComponent("You are not drawing a region. Type /protectregion to start"));
     
     public static void register(CommandDispatcher<CommandSource> dispatcher)
     {
