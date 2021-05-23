@@ -1,6 +1,8 @@
 # Astraea Server Administration
 A Minecraft Forge mod providing tools to aid the administration of your server.
 
+This mod is server-side only. Clients do not need to have this mod installed in order to join your server (installing this mod on a client does nothing).
+
 ## Requirements
 For running:
 - Minecraft Forge Server 36.1.0 or higher (MC version 1.16.5)
