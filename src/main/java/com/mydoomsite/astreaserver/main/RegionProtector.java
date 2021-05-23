@@ -13,6 +13,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.mydoomsite.astreaserver.datatypes.ProtectedRegion;
+import com.mydoomsite.astreaserver.datatypes.SafeFile;
+import com.mydoomsite.astreaserver.helpers.PathHelper;
 import com.mydoomsite.astreaserver.helpers.WorldHelper;
 
 import net.minecraft.util.math.BlockPos;
@@ -28,6 +30,7 @@ public final class RegionProtector
     public static final SimpleCommandExceptionType ERROR_ALREADY_EXISTS = new SimpleCommandExceptionType(new StringTextComponent("A region with that name already exists"));
     public static final SimpleCommandExceptionType ERROR_NO_ACCESS = new SimpleCommandExceptionType(new StringTextComponent("You do not have permission to modify this region"));
     public static final SimpleCommandExceptionType ERROR_INVALID_PROTECTION_LEVEL = new SimpleCommandExceptionType(new StringTextComponent("Invalid protection level"));
+    public static final SimpleCommandExceptionType ERROR_INVALID_NAME = new SimpleCommandExceptionType(new StringTextComponent("Invalid region name"));
     public static final SimpleCommandExceptionType ERROR_UNKNOWN = new SimpleCommandExceptionType(new StringTextComponent("An unknown error occurred. Please check the server log for details"));
     
     // Possible TODO: Implement QuadTree to minimize iterations?
@@ -85,7 +88,7 @@ public final class RegionProtector
             
             try
             {
-                ProtectedRegion region = ProtectedRegion.Load(file.getAbsolutePath());
+                ProtectedRegion region = ProtectedRegion.Load(file);
                 LoadProtectedRegion(world, region);
                 c++;
             }
@@ -138,9 +141,13 @@ public final class RegionProtector
         if(!WorldHelper.IsOverworld(world))
             throw ERROR_NOT_OVERWORLD.create();
         
+        if(!PathHelper.IsFileNameValid(region.Name))
+            throw ERROR_INVALID_NAME.create();
+        
         File regionsPath = WorldHelper.GetProtectedRegionsPath(world);
-        File path = new File(regionsPath, region.Name + ".bin");
-        region.Save(path.getAbsolutePath());
+        SafeFile file = new SafeFile(regionsPath.getCanonicalPath(), region.Name + ".bin", true);
+        
+        region.Save(file);
     }
     
     public static void RemoveProtectedRegion(ServerWorld world, ProtectedRegion region) throws CommandSyntaxException, IOException
@@ -151,12 +158,16 @@ public final class RegionProtector
         File regionsPath = WorldHelper.GetProtectedRegionsPath(world);
         File path = new File(regionsPath, region.Name + ".bin");
         File logFile = new File(regionsPath, region.Name + ".log");
+        File backupFile = new File(regionsPath, region.Name + ".bin.old");
         
         if(path.exists() && !path.delete())
-            throw new IOException("Failed to delete file " + path.getAbsolutePath());
+            throw new IOException("Failed to delete file '" + path.getCanonicalPath() + "'");
         
         if(logFile.exists() && !logFile.delete())
-            throw new IOException("Failed to delete file " + logFile.getAbsolutePath());
+            throw new IOException("Failed to delete file '" + logFile.getCanonicalPath() + "'");
+        
+        if(backupFile.exists() && !backupFile.delete())
+            throw new IOException("Failed to delete file '" + backupFile.getCanonicalPath() + "'");
         
         LoadProtectedRegions(world, true);
     }
@@ -211,6 +222,10 @@ public final class RegionProtector
         try
         {
             WriteProtectedRegion(world, region);
+        }
+        catch (CommandSyntaxException ex)
+        {
+            throw ex;
         }
         catch (Exception ex)
         {

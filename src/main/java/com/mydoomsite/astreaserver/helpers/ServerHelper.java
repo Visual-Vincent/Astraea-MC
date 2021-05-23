@@ -35,7 +35,7 @@ public final class ServerHelper
         File astreaDir = new File(serverPath, "astrea");
         
         if(!astreaDir.exists() && !astreaDir.mkdir())
-            throw new IOException("Failed to create directory " + astreaDir.getAbsolutePath());
+            throw new IOException("Failed to create directory " + astreaDir.getCanonicalPath());
         
         return astreaDir;
     }
@@ -51,7 +51,7 @@ public final class ServerHelper
         File astreaDir = astreaPath.toFile();
         
         if(!astreaDir.exists() && !astreaDir.mkdir())
-            throw new IOException("Failed to create directory " + astreaDir.getAbsolutePath());
+            throw new IOException("Failed to create directory " + astreaDir.getCanonicalPath());
         
         return astreaDir;
     }
@@ -67,7 +67,7 @@ public final class ServerHelper
         File regionsPath = new File(astreaPath, "protectedregions");
         
         if(!regionsPath.exists() && !regionsPath.mkdir())
-            throw new IOException("Failed to create directory " + regionsPath.getAbsolutePath());
+            throw new IOException("Failed to create directory " + regionsPath.getCanonicalPath());
         
         return regionsPath;
     }

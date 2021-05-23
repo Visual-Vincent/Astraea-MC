@@ -1,9 +1,8 @@
 package com.mydoomsite.astreaserver.helpers;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InvalidObjectException;
 import java.io.OutputStream;
 import java.net.URL;
@@ -17,6 +16,7 @@ import org.apache.commons.io.IOUtils;
 
 import com.google.gson.*;
 import com.mydoomsite.astreaserver.datatypes.NBTTagType;
+import com.mydoomsite.astreaserver.datatypes.SafeFile;
 import com.mydoomsite.astreaserver.main.MainRegistry;
 
 import net.minecraft.entity.player.PlayerEntity;
@@ -42,14 +42,14 @@ public final class PlayerHelper
     private static final int SUPERADMINFORMAT_VERSION = 1;
     
     @SubscribeEvent
-    public void PlayerLoggedIn(PlayerLoggedInEvent event)
+    public void OnPlayerLoggedIn(PlayerLoggedInEvent event)
     {
         PlayerEntity player = event.getPlayer();
         PlayerHelper.playerNameCache.put(player.getUUID(), player.getName().getContents());
     }
     
     @SubscribeEvent
-    public void ServerStarting(FMLServerStartingEvent event)
+    public void OnServerStarting(FMLServerStartingEvent event)
     {
         try
         {
@@ -81,28 +81,32 @@ public final class PlayerHelper
     public static void LoadSuperAdmins() throws IOException
     {
         File astreaPath = ServerHelper.GetAstreaServerPath();
-        File file = new File(astreaPath, "superadmins.bin");
+        SafeFile file = new SafeFile(astreaPath.getCanonicalPath(), "superadmins.bin");
         
-        if(!file.exists())
+        if(!file.Exists())
             return;
         
-        CompoundNBT root = CompressedStreamTools.readCompressed(file);
+        CompoundNBT root;
+        try (InputStream stream = file.OpenRead())
+        {
+            root = CompressedStreamTools.readCompressed(stream);
+        }
         
         if(root == null)
-            throw new FileNotFoundException("File not found: " + file.getAbsolutePath());
+            throw new IOException("An unknown error occurred while reading NBT file '" + file.getFullPath() + "'");
         
         if(
             !root.contains("VERSION", NBTTagType.Int.getId()) ||
             !root.contains("players", NBTTagType.List.getId())
         )
-            throw new InvalidObjectException("File \"" + file.getAbsolutePath() + "\" is not a valid ProtectedRegion");
+            throw new InvalidObjectException("File '" + file.getFullPath() + "' is not a valid ProtectedRegion");
         
         int version = root.getInt("VERSION");
         
         if(version < 1)
-            throw new InvalidObjectException("Invalid version " + version + " in file \"" + file.getAbsolutePath() + "\"");
+            throw new InvalidObjectException("Invalid version " + version + " in file '" + file.getFullPath() + "'");
         else if(version > SUPERADMINFORMAT_VERSION)
-            throw new InvalidObjectException("File \"" + file.getAbsolutePath() + "\" is of version " + version + ", only version " + SUPERADMINFORMAT_VERSION + " or lower is supported.");
+            throw new InvalidObjectException("File '" + file.getFullPath() + "' is of version " + version + ", only version " + SUPERADMINFORMAT_VERSION + " or lower is supported.");
         
         ListNBT players = root.getList("players", NBTTagType.String.getId());
         for(INBT entry : players)
@@ -114,7 +118,7 @@ public final class PlayerHelper
             }
             catch (IllegalArgumentException ex)
             {
-                MainRegistry.Logger.error(file.getAbsolutePath() + ": Bad UUID '" + uuid.getAsString() + "'; Ignoring.");
+                MainRegistry.Logger.error("'" + file.getFullPath() + "': Bad UUID '" + uuid.getAsString() + "'; Ignoring.");
             }
         }
     }
@@ -132,10 +136,10 @@ public final class PlayerHelper
         root.put("players", players);
         
         File astreaPath = ServerHelper.GetAstreaServerPath();
-        File file = new File(astreaPath, "superadmins.bin");
-        try (OutputStream outputStream = new FileOutputStream(file, false))
+        SafeFile file = new SafeFile(astreaPath.getCanonicalPath(), "superadmins.bin", true);
+        try (OutputStream stream = file.OpenWrite())
         {
-            CompressedStreamTools.writeCompressed(root, outputStream);
+            CompressedStreamTools.writeCompressed(root, stream);
         }
     }
     

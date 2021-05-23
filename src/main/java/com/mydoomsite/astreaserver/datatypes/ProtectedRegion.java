@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.OutputStream;
+import java.nio.file.AccessDeniedException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -129,13 +130,15 @@ public class ProtectedRegion
         return new Vector3i(compound.getInt("x"), compound.getInt("y"), compound.getInt("z"));
     }
     
-    public static ProtectedRegion Load(String file) throws IOException, InvalidObjectException, IllegalArgumentException
+    public static ProtectedRegion Load(File file) throws FileNotFoundException, InvalidObjectException, IOException
     {
-        File f = new File(file);
-        CompoundNBT root = CompressedStreamTools.readCompressed(f);
+        if(!file.exists())
+            throw new FileNotFoundException("File '" + file.getCanonicalPath() + "' not found");
+        
+        CompoundNBT root = CompressedStreamTools.readCompressed(file);
         
         if(root == null)
-            throw new FileNotFoundException("File not found: " + f.getAbsolutePath());
+            throw new IOException("An unknown error occurred while reading NBT file '" + file.getCanonicalPath() + "'");
         
         Vector3i start, end;
         
@@ -149,14 +152,14 @@ public class ProtectedRegion
             !root.contains("end",   NBTTagType.Compound.getId()) || (end = GetNBTPos(root.getCompound("end"))) == null ||
             !root.contains("trustedPlayers", NBTTagType.List.getId())
         )
-            throw new InvalidObjectException("File \"" + f.getAbsolutePath() + "\" is not a valid ProtectedRegion");
+            throw new InvalidObjectException("File '" + file.getCanonicalPath() + "' is not a valid ProtectedRegion");
         
         int version = root.getInt("VERSION");
         
         if(version < 1)
-            throw new InvalidObjectException("Invalid version " + version + " in file \"" + f.getAbsolutePath() + "\"");
+            throw new InvalidObjectException("Invalid version " + version + " in file '" + file.getCanonicalPath() + "'");
         else if(version > VERSION)
-            throw new InvalidObjectException("File \"" + f.getAbsolutePath() + "\" is of version " + version + ", only version " + VERSION + " or lower is supported.");
+            throw new InvalidObjectException("File '" + file.getCanonicalPath() + "' is of version " + version + ", only version " + VERSION + " or lower is supported.");
         
         String name         = root.getString("name");
         UUID owner          = UUID.fromString(root.getString("owner"));
@@ -175,14 +178,24 @@ public class ProtectedRegion
             }
             catch (IllegalArgumentException ex)
             {
-                MainRegistry.Logger.error(f.getAbsolutePath() + ": Bad UUID '" + uuid.getAsString() + "'; Ignoring.");
+                MainRegistry.Logger.error("'" + file.getCanonicalPath() + "': Bad UUID '" + uuid.getAsString() + "'; Ignoring.");
             }
         }
         
         return region;
     }
     
-    public void Save(String file) throws IOException
+    public static ProtectedRegion Load(SafeFile file) throws IOException, InvalidObjectException
+    {
+        return Load(file.getFile());
+    }
+    
+    public static ProtectedRegion Load(String file) throws IOException, InvalidObjectException
+    {
+        return Load(new File(file));
+    }
+    
+    public void Save(OutputStream stream) throws IOException
     {
         CompoundNBT root = new CompoundNBT();
             root.putInt("VERSION", VERSION);
@@ -210,10 +223,23 @@ public class ProtectedRegion
         }
         root.put("trustedPlayers", trustedPlayers);
         
-        File f = new File(file);
-        try (OutputStream outputStream = new FileOutputStream(f, false))
+        CompressedStreamTools.writeCompressed(root, stream);
+    }
+    
+    public void Save(SafeFile file) throws AccessDeniedException, IOException
+    {
+        try (OutputStream stream = file.OpenWrite())
         {
-            CompressedStreamTools.writeCompressed(root, outputStream);
+            Save(stream);
+        }
+    }
+    
+    public void Save(String file) throws FileNotFoundException, IOException
+    {
+        File f = new File(file);
+        try (OutputStream stream = new FileOutputStream(f, false))
+        {
+            Save(stream);
         }
     }
 }

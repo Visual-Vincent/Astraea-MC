@@ -27,6 +27,9 @@ public final class RegionHelper
         if(RegionProtector.RegionExists(name))
             throw RegionProtector.ERROR_ALREADY_EXISTS.create();
         
+        if(!PathHelper.IsFileNameValid(name))
+            throw RegionProtector.ERROR_INVALID_NAME.create();
+        
         ProtectedRegion region = new ProtectedRegion(name, new Vector3i(start.x, start.y, start.z), new Vector3i(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE), protectionLevel, owner, protector);
         wipRegions.put(protector, region);
         
