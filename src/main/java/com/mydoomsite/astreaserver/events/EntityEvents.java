@@ -10,12 +10,39 @@ import net.minecraft.entity.item.HangingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteract;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteractSpecific;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public final class EntityEvents
 {
+    @SubscribeEvent
+    public void OnAttack(AttackEntityEvent event)
+    {
+        Entity entity = event.getTarget();
+        if(!(
+            entity instanceof HangingEntity ||
+            entity instanceof ArmorStandEntity
+        ))
+            return;
+        
+        World world = entity.level;
+        if(!WorldHelper.IsServerWorld(world))
+            return;
+        
+        PlayerEntity player = event.getPlayer();
+        BlockPos pos = entity.blockPosition();
+        
+        String logMessage = String.format(
+            "%s hit entity \"%s\" at (%d, %d, %d)",
+            player.getName().getContents(), entity.getType().getRegistryName().toString(),
+            pos.getX(), pos.getY(), pos.getZ()
+        );
+            
+        RegionEventCallbacks.RegionDefaultEventCallback(event, world, player, pos, logMessage);
+    }
+    
     @SubscribeEvent
     public void OnInteract(EntityInteract event)
     {

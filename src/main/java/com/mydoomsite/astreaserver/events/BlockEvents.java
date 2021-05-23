@@ -93,6 +93,10 @@ public final class BlockEvents
         )
             return;
         
+        ItemStack itemStack = event.getItemStack();
+        
+        // TODO: Check ItemStack and handle placement of entities such as Paintings, Armor Stand, Item Frame, etc.
+        
         if(!BlockHelper.IsInteractable(block))
             return;
         
@@ -101,8 +105,6 @@ public final class BlockEvents
             player.getName().getContents(), block.getRegistryName().toString(),
             pos.getX(), pos.getY(), pos.getZ()
         );
-        
-        ItemStack itemStack = event.getItemStack();
         
         if(itemStack != null && itemStack != ItemStack.EMPTY)
         {
