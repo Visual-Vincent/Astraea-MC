@@ -110,13 +110,13 @@ public final class BlockEvents
         {
             Item item = itemStack.getItem();
             
-            if(item instanceof BucketItem)
-                return; // Handled by ItemEvents.OnUseBucket()
-            
-            if(item instanceof BlockItem)
-                return;
-            
-            logMessage = String.format("%s using \"%s\"", logMessage, item.getRegistryName().toString());
+            if(!(
+                item instanceof BucketItem ||
+                item instanceof BlockItem
+            ))
+            {
+                logMessage = String.format("%s using \"%s\"", logMessage, item.getRegistryName().toString());
+            }
         }
         
         RegionEventCallbacks.RegionDefaultEventCallback(event, world, player, pos, logMessage);

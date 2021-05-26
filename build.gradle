@@ -13,7 +13,7 @@ apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
 ext {
-    modVersion = '0.1'
+    modVersion = '0.2'
     mcVersion = '1.16.5'
     modAuthor = 'Visual Vincent'
 }
