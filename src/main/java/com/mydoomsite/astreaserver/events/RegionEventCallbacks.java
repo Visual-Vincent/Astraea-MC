@@ -4,11 +4,11 @@ import java.io.File;
 import java.io.FileWriter;
 import java.time.LocalDateTime;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.eventbus.api.Event;
 
 import com.mydoomsite.astreaserver.datatypes.ProtectedRegion;
@@ -59,7 +59,7 @@ public class RegionEventCallbacks
         }
     }
     
-    public static void RegionDefaultEventCallback(Event event, IWorld world, PlayerEntity player, BlockPos position, String logMessage)
+    public static void RegionDefaultEventCallback(Event event, LevelAccessor world, Player player, BlockPos position, String logMessage)
     {
         if(event == null) throw new IllegalArgumentException("'event' cannot be null");
         if(world == null) throw new IllegalArgumentException("'world' cannot be null");
@@ -70,7 +70,7 @@ public class RegionEventCallbacks
         if(!WorldHelper.IsServerWorld(world))
             return;
         
-        ProtectedRegion region = RegionProtector.GetProtectedRegion((ServerWorld)world, position);
+        ProtectedRegion region = RegionProtector.GetProtectedRegion((ServerLevel)world, position);
         
         if(region == null || region.PlayerHasAccess(player))
             return;
@@ -78,7 +78,7 @@ public class RegionEventCallbacks
         RegionProcessEventCallback(event, region, logMessage);
     }
     
-    public static void RegionDefaultEventCallback(Event event, IWorld world, PlayerEntity player, Vector3d position, String logMessage)
+    public static void RegionDefaultEventCallback(Event event, LevelAccessor world, Player player, Vec3 position, String logMessage)
     {
         if(position == null)
             throw new IllegalArgumentException("'position' cannot be null");

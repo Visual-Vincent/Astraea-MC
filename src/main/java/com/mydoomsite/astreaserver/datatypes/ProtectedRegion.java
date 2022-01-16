@@ -17,14 +17,10 @@ import com.mydoomsite.astreaserver.helpers.PlayerHelper;
 import com.mydoomsite.astreaserver.lib.Constants;
 import com.mydoomsite.astreaserver.main.MainRegistry;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.nbt.StringNBT;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.vector.Vector3i;
+import net.minecraft.core.Vec3i;
+import net.minecraft.nbt.*;
+import net.minecraft.Util;
+import net.minecraft.world.entity.player.*;
 
 public class ProtectedRegion
 {
@@ -47,7 +43,7 @@ public class ProtectedRegion
         switch(protectionLevel)
         {
             case PROTECTION_NONE:           return "None";
-            case PROTECTION_LOGGING_ONLY:	return "Logging only";
+            case PROTECTION_LOGGING_ONLY:   return "Logging only";
             case PROTECTION_GRIEFING:       return "Grief protection";
         }
         
@@ -58,12 +54,12 @@ public class ProtectedRegion
     public UUID Owner;
     public UUID Protector;
     public int ProtectionLevel;
-    public final Vector3i Start;
-    public final Vector3i End;
+    public final Vec3i Start;
+    public final Vec3i End;
     
     public final HashSet<UUID> TrustedPlayers = new HashSet<>();
     
-    public ProtectedRegion(String name, Vector3i start, Vector3i end, int protectionLevel, UUID owner, UUID protector)
+    public ProtectedRegion(String name, Vec3i start, Vec3i end, int protectionLevel, UUID owner, UUID protector)
     {
         if(name == null || name.length() <= 0) throw new IllegalArgumentException("Name cannot be null");
         if(start == null) throw new IllegalArgumentException("Start position cannot be null");
@@ -79,14 +75,14 @@ public class ProtectedRegion
             throw new IllegalArgumentException("Player UUID cannot be nil");
         
         this.Name = name;
-        this.Start = new Vector3i(Math.min(start.getX(), end.getX()), Math.min(start.getY(), end.getY()), Math.min(start.getZ(), end.getZ()));
-        this.End   = new Vector3i(Math.max(start.getX(), end.getX()), Math.max(start.getY(), end.getY()), Math.max(start.getZ(), end.getZ()));
+        this.Start = new Vec3i(Math.min(start.getX(), end.getX()), Math.min(start.getY(), end.getY()), Math.min(start.getZ(), end.getZ()));
+        this.End   = new Vec3i(Math.max(start.getX(), end.getX()), Math.max(start.getY(), end.getY()), Math.max(start.getZ(), end.getZ()));
         this.ProtectionLevel = protectionLevel;
         this.Owner     = owner;
         this.Protector = protector;
     }
     
-    public boolean Contains(Vector3i position)
+    public boolean Contains(Vec3i position)
     {
         int x = position.getX();
         int y = position.getY();
@@ -99,7 +95,7 @@ public class ProtectedRegion
         );
     }
     
-    public boolean PlayerHasAccess(PlayerEntity player)
+    public boolean PlayerHasAccess(Player player)
     {
         if(Constants.DEBUG)
             return false;
@@ -108,13 +104,13 @@ public class ProtectedRegion
         return this.Owner.equals(uuid) || PlayerHelper.IsSuperAdmin(uuid) || this.TrustedPlayers.contains(uuid);
     }
     
-    public boolean PlayerHasAdminAccess(PlayerEntity player)
+    public boolean PlayerHasAdminAccess(Player player)
     {
         UUID uuid = player.getUUID();
         return this.Owner.equals(uuid) || PlayerHelper.IsSuperAdmin(uuid) || (this.Protector.equals(uuid) && PlayerHelper.IsOp(player));
     }
     
-    private static boolean ValidateNBTPos(CompoundNBT compound)
+    private static boolean ValidateNBTPos(CompoundTag compound)
     {
         return compound != null &&
             compound.contains("x", NBTTagType.Int.getId()) &&
@@ -122,12 +118,12 @@ public class ProtectedRegion
             compound.contains("z", NBTTagType.Int.getId());
     }
     
-    private static Vector3i GetNBTPos(CompoundNBT compound)
+    private static Vec3i GetNBTPos(CompoundTag compound)
     {
         if(!ValidateNBTPos(compound))
             return null;
         
-        return new Vector3i(compound.getInt("x"), compound.getInt("y"), compound.getInt("z"));
+        return new Vec3i(compound.getInt("x"), compound.getInt("y"), compound.getInt("z"));
     }
     
     public static ProtectedRegion Load(File file) throws FileNotFoundException, InvalidObjectException, IOException
@@ -135,12 +131,12 @@ public class ProtectedRegion
         if(!file.exists())
             throw new FileNotFoundException("File '" + file.getCanonicalPath() + "' not found");
         
-        CompoundNBT root = CompressedStreamTools.readCompressed(file);
+        CompoundTag root = NbtIo.readCompressed(file);
         
         if(root == null)
             throw new IOException("An unknown error occurred while reading NBT file '" + file.getCanonicalPath() + "'");
         
-        Vector3i start, end;
+        Vec3i start, end;
         
         if(
             !root.contains("VERSION", NBTTagType.Int.getId()) ||
@@ -168,10 +164,10 @@ public class ProtectedRegion
         
         ProtectedRegion region = new ProtectedRegion(name, start, end, protectionLevel, owner, protector);
         
-        ListNBT trustedPlayers = root.getList("trustedPlayers", NBTTagType.String.getId());
-        for(INBT entry : trustedPlayers)
+        ListTag trustedPlayers = root.getList("trustedPlayers", NBTTagType.String.getId());
+        for(Tag entry : trustedPlayers)
         {
-            StringNBT uuid = (StringNBT)entry;
+            StringTag uuid = (StringTag)entry;
             try
             {
                 region.TrustedPlayers.add(UUID.fromString(uuid.getAsString()));
@@ -197,33 +193,33 @@ public class ProtectedRegion
     
     public void Save(OutputStream stream) throws IOException
     {
-        CompoundNBT root = new CompoundNBT();
+        CompoundTag root = new CompoundTag();
             root.putInt("VERSION", VERSION);
             root.putString("name", this.Name);
             root.putString("owner", this.Owner.toString());
             root.putString("protector", this.Protector.toString());
             root.putInt("protectionLevel", this.ProtectionLevel);
         
-        CompoundNBT start = new CompoundNBT();
+        CompoundTag start = new CompoundTag();
             start.putInt("x", this.Start.getX());
             start.putInt("y", this.Start.getY());
             start.putInt("z", this.Start.getZ());
         root.put("start", start);
         
-        CompoundNBT end = new CompoundNBT();
+        CompoundTag end = new CompoundTag();
             end.putInt("x", this.End.getX());
             end.putInt("y", this.End.getY());
             end.putInt("z", this.End.getZ());
         root.put("end", end);
         
-        ListNBT trustedPlayers = new ListNBT();
+        ListTag trustedPlayers = new ListTag();
         for(UUID uuid : this.TrustedPlayers)
         {
-            trustedPlayers.add(StringNBT.valueOf(uuid.toString()));
+            trustedPlayers.add(StringTag.valueOf(uuid.toString()));
         }
         root.put("trustedPlayers", trustedPlayers);
         
-        CompressedStreamTools.writeCompressed(root, stream);
+        NbtIo.writeCompressed(root, stream);
     }
     
     public void Save(SafeFile file) throws AccessDeniedException, IOException

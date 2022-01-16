@@ -1,10 +1,9 @@
 package com.mydoomsite.astreaserver.commands;
 
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
-import net.minecraft.command.arguments.EntityArgument;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.commands.*;
+import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.ServerLevel;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mydoomsite.astreaserver.datatypes.ProtectedRegion;
@@ -14,7 +13,7 @@ import com.mydoomsite.astreaserver.main.RegionProtector;
 
 public class RegionDistrustCommand
 {
-    public static void register(CommandDispatcher<CommandSource> dispatcher)
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher)
     {
         dispatcher.register(
             Commands.literal("regiondistrust")
@@ -23,10 +22,10 @@ public class RegionDistrustCommand
             })
             .then(Commands.argument("player", EntityArgument.player())
             .executes((context) -> {
-                CommandSource src = context.getSource();
-                ServerWorld world = src.getLevel();
-                ServerPlayerEntity caller = src.getPlayerOrException();
-                ServerPlayerEntity player = EntityArgument.getPlayer(context, "player");
+                CommandSourceStack src = context.getSource();
+                ServerLevel world = src.getLevel();
+                ServerPlayer caller = src.getPlayerOrException();
+                ServerPlayer player = EntityArgument.getPlayer(context, "player");
                 
                 if(!WorldHelper.IsOverworld(world))
                     throw RegionProtector.ERROR_NOT_OVERWORLD.create();

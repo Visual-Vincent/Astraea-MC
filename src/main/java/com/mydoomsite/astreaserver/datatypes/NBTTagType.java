@@ -9,7 +9,7 @@ public enum NBTTagType
     Long        (4),
     Float       (5),
     Double      (6),
-    ByteArray	(7),
+    ByteArray   (7),
     String      (8),
     List        (9),
     Compound    (10),

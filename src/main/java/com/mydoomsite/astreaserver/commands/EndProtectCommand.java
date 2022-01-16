@@ -2,12 +2,11 @@ package com.mydoomsite.astreaserver.commands;
 
 import java.util.UUID;
 
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.commands.*;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.phys.Vec3;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
@@ -17,21 +16,21 @@ import com.mydoomsite.astreaserver.helpers.RegionHelper;
 
 public class EndProtectCommand
 {
-    private static final SimpleCommandExceptionType ERROR_NOT_DRAWING = new SimpleCommandExceptionType(new StringTextComponent("You are not drawing a region. Type /protectregion to start"));
+    private static final SimpleCommandExceptionType ERROR_NOT_DRAWING = new SimpleCommandExceptionType(new TextComponent("You are not drawing a region. Type /protectregion to start"));
     
-    public static void register(CommandDispatcher<CommandSource> dispatcher)
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher)
     {
         dispatcher.register(
             Commands.literal("endprotect")
             .requires((cmdSource) -> {
                 return cmdSource.hasPermission(2);
             }).executes((context) -> {
-                CommandSource src = context.getSource();
-                ServerWorld world = src.getLevel();
-                ServerPlayerEntity protector = src.getPlayerOrException();
+                CommandSourceStack src = context.getSource();
+                ServerLevel world = src.getLevel();
+                ServerPlayer protector = src.getPlayerOrException();
                 
                 UUID protectorUuid = protector.getUUID();
-                Vector3d end = protector.position();
+                Vec3 end = protector.position();
                 
                 ProtectedRegion region = RegionHelper.EndProtectRegion(world, end, protectorUuid);
                 if(region != null)

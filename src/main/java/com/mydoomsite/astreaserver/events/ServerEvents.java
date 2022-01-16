@@ -1,20 +1,20 @@
 package com.mydoomsite.astreaserver.events;
 
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
+import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
 
 import com.mydoomsite.astreaserver.main.RegionProtector;
 
 public final class ServerEvents
 {
     @SubscribeEvent
-    public void ServerStarted(final FMLServerStartedEvent event)
+    public void ServerStarted(final ServerStartedEvent event)
     {
         MinecraftServer server = event.getServer();
-        ServerWorld world = server.getLevel(World.OVERWORLD);
+        ServerLevel world = server.getLevel(Level.OVERWORLD);
         
         try
         {

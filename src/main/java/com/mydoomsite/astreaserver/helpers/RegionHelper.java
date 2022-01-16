@@ -4,9 +4,9 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.math.vector.Vector3i;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.core.Vec3i;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.phys.Vec3;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mydoomsite.astreaserver.datatypes.ProtectedRegion;
@@ -16,7 +16,7 @@ public final class RegionHelper
 {
     private static Map<UUID, ProtectedRegion> wipRegions = new ConcurrentHashMap<>();
     
-    public static boolean BeginProtectRegion(ServerWorld world, String name, Vector3d start, int protectionLevel, UUID owner, UUID protector) throws CommandSyntaxException
+    public static boolean BeginProtectRegion(ServerLevel world, String name, Vec3 start, int protectionLevel, UUID owner, UUID protector) throws CommandSyntaxException
     {
         if(!WorldHelper.IsOverworld(world))
             throw RegionProtector.ERROR_NOT_OVERWORLD.create();
@@ -30,13 +30,13 @@ public final class RegionHelper
         if(!PathHelper.IsFileNameValid(name))
             throw RegionProtector.ERROR_INVALID_NAME.create();
         
-        ProtectedRegion region = new ProtectedRegion(name, new Vector3i(start.x, start.y, start.z), new Vector3i(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE), protectionLevel, owner, protector);
+        ProtectedRegion region = new ProtectedRegion(name, new Vec3i(start.x, start.y, start.z), new Vec3i(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE), protectionLevel, owner, protector);
         wipRegions.put(protector, region);
         
         return true;
     }
     
-    public static ProtectedRegion EndProtectRegion(ServerWorld world, Vector3d end, UUID protector) throws CommandSyntaxException
+    public static ProtectedRegion EndProtectRegion(ServerLevel world, Vec3 end, UUID protector) throws CommandSyntaxException
     {
         if(!WorldHelper.IsOverworld(world))
             throw RegionProtector.ERROR_NOT_OVERWORLD.create();
@@ -47,7 +47,7 @@ public final class RegionHelper
         ProtectedRegion wip = wipRegions.get(protector);
         CancelProtectRegion(protector);
         
-        ProtectedRegion region = RegionProtector.ProtectRegion(world, wip.Name, wip.Start, new Vector3i(end.x, end.y, end.z), wip.ProtectionLevel, wip.Owner, wip.Protector);
+        ProtectedRegion region = RegionProtector.ProtectRegion(world, wip.Name, wip.Start, new Vec3i(end.x, end.y, end.z), wip.ProtectionLevel, wip.Owner, wip.Protector);
         return region;
     }
     

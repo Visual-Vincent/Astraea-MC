@@ -5,10 +5,10 @@ This mod is server-side only. Clients do not need to have this mod installed in 
 
 ## Requirements
 For running:
-- Minecraft Forge Server 36.1.0 or higher (MC version 1.16.5)
+- Minecraft Forge Server 39.0.36 or higher (MC version 1.18.1)
 
 For building:
-- Java SE Development Kit 8 (JDK 8) or higher (OpenJDK works as well)
+- Java SE Development Kit 17 / OpenJDK 17 or higher
 
 ## Commands
 

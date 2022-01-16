@@ -19,18 +19,14 @@ import com.mydoomsite.astreaserver.datatypes.NBTTagType;
 import com.mydoomsite.astreaserver.datatypes.SafeFile;
 import com.mydoomsite.astreaserver.main.MainRegistry;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.nbt.StringNBT;
-import net.minecraft.util.Util;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.nbt.*;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.Util;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
+import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 
 public final class PlayerHelper
 {
@@ -44,12 +40,12 @@ public final class PlayerHelper
     @SubscribeEvent
     public void OnPlayerLoggedIn(PlayerLoggedInEvent event)
     {
-        PlayerEntity player = event.getPlayer();
+        Player player = event.getPlayer();
         PlayerHelper.playerNameCache.put(player.getUUID(), player.getName().getContents());
     }
     
     @SubscribeEvent
-    public void OnServerStarting(FMLServerStartingEvent event)
+    public void OnServerStarting(ServerStartingEvent event)
     {
         try
         {
@@ -61,14 +57,14 @@ public final class PlayerHelper
         }
     }
     
-    public static boolean IsOp(PlayerEntity player)
+    public static boolean IsOp(Player player)
     {
-        World world = player.level;
+        Level world = player.level;
         
-        if(!(world instanceof ServerWorld))
+        if(!(world instanceof ServerLevel))
             return false;
         
-        ServerWorld serverWorld = (ServerWorld)world;
+        ServerLevel serverWorld = (ServerLevel)world;
         
         return serverWorld.getServer().getPlayerList().isOp(player.getGameProfile());
     }
@@ -86,10 +82,10 @@ public final class PlayerHelper
         if(!file.Exists())
             return;
         
-        CompoundNBT root;
+        CompoundTag root;
         try (InputStream stream = file.OpenRead())
         {
-            root = CompressedStreamTools.readCompressed(stream);
+            root = NbtIo.readCompressed(stream);
         }
         
         if(root == null)
@@ -108,10 +104,10 @@ public final class PlayerHelper
         else if(version > SUPERADMINFORMAT_VERSION)
             throw new InvalidObjectException("File '" + file.getFullPath() + "' is of version " + version + ", only version " + SUPERADMINFORMAT_VERSION + " or lower is supported.");
         
-        ListNBT players = root.getList("players", NBTTagType.String.getId());
-        for(INBT entry : players)
+        ListTag players = root.getList("players", NBTTagType.String.getId());
+        for(Tag entry : players)
         {
-            StringNBT uuid = (StringNBT)entry;
+            StringTag uuid = (StringTag)entry;
             try
             {
                 superAdmins.add(UUID.fromString(uuid.getAsString()));
@@ -125,13 +121,13 @@ public final class PlayerHelper
     
     private static void SaveSuperAdmins() throws IOException
     {
-        CompoundNBT root = new CompoundNBT();
+        CompoundTag root = new CompoundTag();
         root.putInt("VERSION", SUPERADMINFORMAT_VERSION);
         
-        ListNBT players = new ListNBT();
+        ListTag players = new ListTag();
         for(UUID uuid : superAdmins)
         {
-            players.add(StringNBT.valueOf(uuid.toString()));
+            players.add(StringTag.valueOf(uuid.toString()));
         }
         root.put("players", players);
         
@@ -139,7 +135,7 @@ public final class PlayerHelper
         SafeFile file = new SafeFile(astreaPath.getCanonicalPath(), "superadmins.bin", true);
         try (OutputStream stream = file.OpenWrite())
         {
-            CompressedStreamTools.writeCompressed(root, stream);
+            NbtIo.writeCompressed(root, stream);
         }
     }
     
@@ -174,9 +170,7 @@ public final class PlayerHelper
         
         URL url = new URL(String.format(PLAYERNAME_API_URL, uuid.toString().replaceAll("-", "")));
         String json = IOUtils.toString(url, StandardCharsets.UTF_8);
-        
-        JsonParser parser = new JsonParser();
-        JsonElement root = parser.parse(json);
+        JsonElement root = JsonParser.parseString(json);
         
         if(!root.isJsonArray())
             throw new Exception("Invalid response from server");

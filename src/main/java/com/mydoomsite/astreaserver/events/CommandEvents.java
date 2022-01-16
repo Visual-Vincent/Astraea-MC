@@ -3,7 +3,7 @@ package com.mydoomsite.astreaserver.events;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mydoomsite.astreaserver.commands.*;
 
-import net.minecraft.command.CommandSource;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
@@ -12,7 +12,7 @@ public final class CommandEvents
     @SubscribeEvent
     public void RegisterCommands(final RegisterCommandsEvent event)
     {
-        CommandDispatcher<CommandSource> dispatcher = event.getDispatcher();
+        CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
         
         ProtectRegionCommand.register(dispatcher);
         EndProtectCommand.register(dispatcher);

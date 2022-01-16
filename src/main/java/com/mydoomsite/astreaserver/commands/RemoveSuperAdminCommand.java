@@ -1,9 +1,8 @@
 package com.mydoomsite.astreaserver.commands;
 
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
-import net.minecraft.command.arguments.EntityArgument;
-import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.commands.*;
+import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.server.level.ServerPlayer;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mydoomsite.astreaserver.helpers.CommandHelper;
@@ -11,7 +10,7 @@ import com.mydoomsite.astreaserver.helpers.PlayerHelper;
 
 public class RemoveSuperAdminCommand
 {
-    public static void register(CommandDispatcher<CommandSource> dispatcher)
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher)
     {
         dispatcher.register(
             Commands.literal("removesuperadmin")
@@ -25,8 +24,8 @@ public class RemoveSuperAdminCommand
             })
             .then(Commands.argument("player", EntityArgument.player())
             .executes((context) -> {
-                CommandSource src = context.getSource();
-                ServerPlayerEntity player = EntityArgument.getPlayer(context, "player");
+                CommandSourceStack src = context.getSource();
+                ServerPlayer player = EntityArgument.getPlayer(context, "player");
                 
                 try
                 {

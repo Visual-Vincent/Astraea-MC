@@ -3,24 +3,12 @@ package com.mydoomsite.astreaserver.events;
 import com.mydoomsite.astreaserver.helpers.BlockHelper;
 import com.mydoomsite.astreaserver.helpers.WorldHelper;
 
-import net.minecraft.block.AbstractButtonBlock;
-import net.minecraft.block.BellBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.CraftingTableBlock;
-import net.minecraft.block.DoorBlock;
-import net.minecraft.block.EnderChestBlock;
-import net.minecraft.block.FenceGateBlock;
-import net.minecraft.block.LeverBlock;
-import net.minecraft.block.StonecutterBlock;
-import net.minecraft.block.TrapDoorBlock;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.BucketItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.*;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.*;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -33,7 +21,7 @@ public final class BlockEvents
         if(!WorldHelper.IsServerWorld(event.getWorld()))
             return;
         
-        PlayerEntity player = event.getPlayer();
+        Player player = event.getPlayer();
         BlockPos pos = event.getPos();
         
         String logMessage = String.format(
@@ -52,10 +40,10 @@ public final class BlockEvents
             return;
         
         Entity entity = event.getEntity();
-        if(!(entity instanceof PlayerEntity))
+        if(!(entity instanceof Player))
             return;
         
-        PlayerEntity player = (PlayerEntity)entity;
+        Player player = (Player)entity;
         BlockPos pos = event.getPos();
         
         String logMessage = String.format(
@@ -70,11 +58,11 @@ public final class BlockEvents
     @SubscribeEvent
     public void OnRightClick(RightClickBlock event)
     {
-        World world = event.getWorld();
+        Level world = event.getWorld();
         if(!WorldHelper.IsServerWorld(world))
             return;
         
-        PlayerEntity player = event.getPlayer();
+        Player player = event.getPlayer();
         BlockPos pos = event.getPos();
         Block block = world.getBlockState(pos).getBlock();
         
@@ -85,7 +73,7 @@ public final class BlockEvents
             block instanceof FenceGateBlock ||
             //block instanceof BedBlock ||
             block instanceof CraftingTableBlock ||
-            block instanceof AbstractButtonBlock ||
+            block instanceof ButtonBlock ||
             block instanceof LeverBlock ||
             block instanceof StonecutterBlock ||
             block instanceof BellBlock ||

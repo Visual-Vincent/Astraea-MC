@@ -1,7 +1,6 @@
 package com.mydoomsite.astreaserver.commands;
 
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
+import net.minecraft.commands.*;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -10,14 +9,14 @@ import com.mydoomsite.astreaserver.main.RegionProtector;
 
 public class ReloadProtectedRegionsCommand
 {
-    public static void register(CommandDispatcher<CommandSource> dispatcher)
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher)
     {
         dispatcher.register(
             Commands.literal("reloadprotectedregions")
             .requires((cmdSource) -> {
                 return cmdSource.hasPermission(2);
             }).executes((context) -> {
-                CommandSource src = context.getSource();
+                CommandSourceStack src = context.getSource();
                 
                 try
                 {

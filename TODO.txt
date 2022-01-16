@@ -1,0 +1,1 @@
+* If an outsider rides a horse (or other interactable entity: boat, minecart, etc.) into your protected region, they will no longer be able to mount it again.

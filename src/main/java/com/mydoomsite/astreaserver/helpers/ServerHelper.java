@@ -4,22 +4,22 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 
+import net.minecraft.Util;
+import net.minecraft.network.chat.ChatType;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.Util;
-import net.minecraft.util.text.ChatType;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.storage.FolderName;
-import net.minecraftforge.fml.server.ServerLifecycleHooks;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.storage.LevelResource;
+import net.minecraftforge.server.ServerLifecycleHooks;
 
 public final class ServerHelper
 {
-    public static void BroadcastMessage(IWorld world, ITextComponent text, ChatType type)
+    public static void BroadcastMessage(LevelAccessor world, Component text, ChatType type)
     {
         BroadcastMessage(WorldHelper.GetWorldServer(world), text, type);
     }
     
-    public static void BroadcastMessage(MinecraftServer server, ITextComponent text, ChatType type)
+    public static void BroadcastMessage(MinecraftServer server, Component text, ChatType type)
     {
         server.getPlayerList().broadcastMessage(text, type, Util.NIL_UUID);
     }
@@ -47,7 +47,7 @@ public final class ServerHelper
     
     public static File GetAstreaWorldPath(MinecraftServer server) throws IOException
     {
-        Path astreaPath = server.getWorldPath(new FolderName("astrea"));
+        Path astreaPath = server.getWorldPath(new LevelResource("astrea"));
         File astreaDir = astreaPath.toFile();
         
         if(!astreaDir.exists() && !astreaDir.mkdir())
@@ -56,11 +56,11 @@ public final class ServerHelper
         return astreaDir;
     }
     
-    
     public static File GetProtectedRegionsPath() throws IOException
     {
         return GetProtectedRegionsPath(ServerLifecycleHooks.getCurrentServer());
     }
+    
     public static File GetProtectedRegionsPath(MinecraftServer server) throws IOException
     {
         File astreaPath = GetAstreaWorldPath(server);

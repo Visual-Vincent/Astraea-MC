@@ -6,33 +6,33 @@ import java.io.IOException;
 import javax.annotation.Nullable;
 
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.Dimension;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.dimension.DimensionType;
 
 public final class WorldHelper
 {
     @Nullable
-    public static MinecraftServer GetWorldServer(IWorld world)
+    public static MinecraftServer GetWorldServer(LevelAccessor world)
     {
-        if(world == null || !(world instanceof ServerWorld))
+        if(world == null || !(world instanceof ServerLevel))
             return null;
         
-        return ((ServerWorld)world).getServer();
+        return ((ServerLevel)world).getServer();
     }
     
-    public static boolean IsServerWorld(IWorld world)
+    public static boolean IsServerWorld(LevelAccessor world)
     {
-        return world != null && !world.isClientSide() && world instanceof ServerWorld;
+        return world != null && !world.isClientSide() && world instanceof ServerLevel;
     }
     
-    public static boolean IsOverworld(World world)
+    public static boolean IsOverworld(Level world)
     {
-        return world.dimension().location().getPath() == Dimension.OVERWORLD.location().getPath();
+        return world.dimension().location().getPath() == DimensionType.OVERWORLD_LOCATION.location().getPath();
     }
     
-    public static File GetServerPath(IWorld world)
+    public static File GetServerPath(LevelAccessor world)
     {
         if(world == null)
             throw new NullPointerException("Argument 'world' cannot be null");
@@ -45,17 +45,17 @@ public final class WorldHelper
         return server.getServerDirectory();
     }
     
-    public static File GetAstreaServerPath(IWorld world) throws IOException
+    public static File GetAstreaServerPath(LevelAccessor world) throws IOException
     {
         return ServerHelper.GetAstreaServerPath(WorldHelper.GetWorldServer(world));
     }
     
-    public static File GetAstreaWorldPath(IWorld world) throws IOException
+    public static File GetAstreaWorldPath(LevelAccessor world) throws IOException
     {
         return ServerHelper.GetAstreaWorldPath(WorldHelper.GetWorldServer(world));
     }
     
-    public static File GetProtectedRegionsPath(IWorld world) throws IOException
+    public static File GetProtectedRegionsPath(LevelAccessor world) throws IOException
     {
         return ServerHelper.GetProtectedRegionsPath(WorldHelper.GetWorldServer(world));
     }

@@ -10,20 +10,18 @@ import com.mydoomsite.astreaserver.helpers.CommandHelper;
 import com.mydoomsite.astreaserver.helpers.RegionHelper;
 import com.mydoomsite.astreaserver.main.RegionProtector;
 
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
-import net.minecraft.command.ISuggestionProvider;
-import net.minecraft.command.arguments.EntityArgument;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.commands.*;
+import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.server.level.ServerLevel;
 
 public final class ProtectRegionCommand
 {
-    private static final SimpleCommandExceptionType ERROR_ALREADY_DRAWING = new SimpleCommandExceptionType(new StringTextComponent("You are already drawing a region. Type /cancelprotect to cancel."));
+    private static final SimpleCommandExceptionType ERROR_ALREADY_DRAWING = new SimpleCommandExceptionType(new TextComponent("You are already drawing a region. Type /cancelprotect to cancel."));
     
-    public static void register(CommandDispatcher<CommandSource> dispatcher)
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher)
     {
         dispatcher.register(
             Commands.literal("protectregion")
@@ -33,11 +31,11 @@ public final class ProtectRegionCommand
             .then(Commands.argument("owner", EntityArgument.player())
             .then(Commands.argument("protection level", StringArgumentType.word())
                 .suggests((context, builder) -> {
-                    return ISuggestionProvider.suggest(ProtectedRegion.ProtectionLevels.keySet(), builder);
+                    return SharedSuggestionProvider.suggest(ProtectedRegion.ProtectionLevels.keySet(), builder);
                 })
             .then(Commands.argument("region name", StringArgumentType.greedyString()).executes((context) -> {
-                CommandSource src = context.getSource();
-                ServerWorld world = src.getLevel();
+                CommandSourceStack src = context.getSource();
+                ServerLevel world = src.getLevel();
                 
                 String name = StringArgumentType.getString(context, "region name");
                 String protectionLevelStr = StringArgumentType.getString(context, "protection level");
@@ -46,12 +44,12 @@ public final class ProtectRegionCommand
                 if(protectionLevel == null)
                     throw RegionProtector.ERROR_INVALID_PROTECTION_LEVEL.create();
                 
-                ServerPlayerEntity protector = src.getPlayerOrException();
+                ServerPlayer protector = src.getPlayerOrException();
                 
                 UUID ownerUuid = EntityArgument.getPlayer(context, "owner").getUUID();
                 UUID protectorUuid = protector.getUUID();
                 
-                Vector3d start = protector.position();
+                Vec3 start = protector.position();
                 
                 if(RegionHelper.BeginProtectRegion(world, name, start, protectionLevel, ownerUuid, protectorUuid))
                 {

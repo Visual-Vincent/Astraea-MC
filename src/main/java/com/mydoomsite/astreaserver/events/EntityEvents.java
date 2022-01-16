@@ -3,13 +3,11 @@ package com.mydoomsite.astreaserver.events;
 import com.mydoomsite.astreaserver.helpers.EntityHelper;
 import com.mydoomsite.astreaserver.helpers.WorldHelper;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.item.ArmorStandEntity;
-import net.minecraft.entity.item.HangingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.decoration.*;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteract;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteractSpecific;
@@ -23,15 +21,15 @@ public final class EntityEvents
         Entity entity = event.getTarget();
         if(!(
             entity instanceof HangingEntity ||
-            entity instanceof ArmorStandEntity
+            entity instanceof ArmorStand
         ))
             return;
         
-        World world = entity.level;
+        Level world = entity.level;
         if(!WorldHelper.IsServerWorld(world))
             return;
         
-        PlayerEntity player = event.getPlayer();
+        Player player = event.getPlayer();
         BlockPos pos = entity.blockPosition();
         
         String logMessage = String.format(
@@ -46,24 +44,24 @@ public final class EntityEvents
     @SubscribeEvent
     public void OnInteract(EntityInteract event)
     {
-        World world = event.getWorld();
+        Level world = event.getWorld();
         if(!WorldHelper.IsServerWorld(world))
             return;
         
-        PlayerEntity player = event.getPlayer();
+        Player player = event.getPlayer();
         Entity target = event.getTarget();
         BlockPos pos = event.getPos();
         
-        if(target instanceof PlayerEntity)
+        if(target instanceof Player)
             return;
         
         // TODO: Owned horses shouldn't be mountable, etc. Write special cases for such mobs
-        if(target instanceof MobEntity)
+        if(target instanceof Mob)
             return;
         
         if(!(
             target instanceof HangingEntity ||
-            target instanceof ArmorStandEntity
+            target instanceof ArmorStand
         ))
             return;
         
@@ -82,23 +80,23 @@ public final class EntityEvents
     @SubscribeEvent
     public void OnInteractSpecific(EntityInteractSpecific event)
     {
-        World world = event.getWorld();
+        Level world = event.getWorld();
         if(!WorldHelper.IsServerWorld(world))
             return;
         
-        PlayerEntity player = event.getPlayer();
+        Player player = event.getPlayer();
         Entity target = event.getTarget();
         BlockPos pos = event.getPos();
         
-        if(target instanceof PlayerEntity)
+        if(target instanceof Player)
             return;
         
-        if(target instanceof MobEntity)
+        if(target instanceof Mob)
             return;
         
         if(!(
             target instanceof HangingEntity ||
-            target instanceof ArmorStandEntity
+            target instanceof ArmorStand
         ))
             return;
         

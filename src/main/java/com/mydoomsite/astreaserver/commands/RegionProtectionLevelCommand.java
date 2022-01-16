@@ -1,10 +1,8 @@
 package com.mydoomsite.astreaserver.commands;
 
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
-import net.minecraft.command.ISuggestionProvider;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.commands.*;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.ServerLevel;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -15,7 +13,7 @@ import com.mydoomsite.astreaserver.main.RegionProtector;
 
 public class RegionProtectionLevelCommand
 {
-    public static void register(CommandDispatcher<CommandSource> dispatcher)
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher)
     {
         dispatcher.register(
             Commands.literal("regionprotectionlevel")
@@ -23,9 +21,9 @@ public class RegionProtectionLevelCommand
                 return cmdSource.hasPermission(2);
             })
             .executes((context) -> {
-                CommandSource src = context.getSource();
-                ServerWorld world = src.getLevel();
-                ServerPlayerEntity caller = src.getPlayerOrException();
+                CommandSourceStack src = context.getSource();
+                ServerLevel world = src.getLevel();
+                ServerPlayer caller = src.getPlayerOrException();
                 
                 if(!WorldHelper.IsOverworld(world))
                     throw RegionProtector.ERROR_NOT_OVERWORLD.create();
@@ -47,12 +45,12 @@ public class RegionProtectionLevelCommand
             })
             .then(Commands.argument("new level", StringArgumentType.word())
                 .suggests((context, builder) -> {
-                    return ISuggestionProvider.suggest(ProtectedRegion.ProtectionLevels.keySet(), builder);
+                    return SharedSuggestionProvider.suggest(ProtectedRegion.ProtectionLevels.keySet(), builder);
                 })
             .executes((context) -> {
-                CommandSource src = context.getSource();
-                ServerWorld world = src.getLevel();
-                ServerPlayerEntity caller = src.getPlayerOrException();
+                CommandSourceStack src = context.getSource();
+                ServerLevel world = src.getLevel();
+                ServerPlayer caller = src.getPlayerOrException();
                 
                 if(!WorldHelper.IsOverworld(world))
                     throw RegionProtector.ERROR_NOT_OVERWORLD.create();

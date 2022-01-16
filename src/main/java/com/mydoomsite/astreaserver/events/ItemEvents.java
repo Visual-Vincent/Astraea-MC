@@ -1,19 +1,20 @@
 package com.mydoomsite.astreaserver.events;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.FlowingFluidBlock;
-import net.minecraft.block.IBucketPickupHandler;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.BucketItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.RayTraceResult.Type;
-import net.minecraft.world.World;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BucketItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.BucketPickup;
+import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.HitResult.Type;
 import net.minecraftforge.event.entity.player.FillBucketEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
@@ -24,20 +25,20 @@ public class ItemEvents
     @SubscribeEvent
     public void OnUseBucket(FillBucketEvent event)
     {
-        World world = event.getWorld();
+        Level world = event.getWorld();
         if(!WorldHelper.IsServerWorld(world))
             return;
         
-        RayTraceResult target = event.getTarget();
+        HitResult target = event.getTarget();
         if(target == null || target.getType() != Type.BLOCK)
             return;
         
-        if(!(target instanceof BlockRayTraceResult))
+        if(!(target instanceof BlockHitResult))
             return;
         
-        BlockRayTraceResult blockResult = (BlockRayTraceResult)target;
+        BlockHitResult blockResult = (BlockHitResult)target;
         
-        PlayerEntity player = event.getPlayer();
+        Player player = event.getPlayer();
         BlockPos pos = blockResult.getBlockPos();
         Block block = world.getBlockState(pos).getBlock();
         
@@ -64,7 +65,7 @@ public class ItemEvents
         }
         else
         {
-            if(!(block instanceof IBucketPickupHandler) && !(block instanceof FlowingFluidBlock))
+            if(!(block instanceof BucketPickup) && !(block instanceof LiquidBlock))
                 return;
             
             logMessage = String.format(

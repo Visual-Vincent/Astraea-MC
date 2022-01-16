@@ -1,9 +1,8 @@
 package com.mydoomsite.astreaserver.commands;
 
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.commands.*;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.ServerLevel;
 
 import com.mojang.brigadier.CommandDispatcher;import com.mydoomsite.astreaserver.datatypes.ProtectedRegion;
 import com.mydoomsite.astreaserver.helpers.CommandHelper;
@@ -13,20 +12,20 @@ import com.mydoomsite.astreaserver.main.RegionProtector;
 
 public class RegionInfoCommand
 {
-    public static void register(CommandDispatcher<CommandSource> dispatcher)
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher)
     {
         dispatcher.register(
             Commands.literal("regioninfo")
             .requires((cmdSource) -> {
                 return cmdSource.hasPermission(2);
             }).executes((context) -> {
-                CommandSource src = context.getSource();
-                ServerWorld world = src.getLevel();
+                CommandSourceStack src = context.getSource();
+                ServerLevel world = src.getLevel();
                 
                 if(!WorldHelper.IsOverworld(world))
                     throw RegionProtector.ERROR_NOT_OVERWORLD.create();
                 
-                ServerPlayerEntity caller = src.getPlayerOrException();
+                ServerPlayer caller = src.getPlayerOrException();
                 
                 ProtectedRegion region = RegionProtector.GetProtectedRegion(world, caller.position());
                 if(region != null)

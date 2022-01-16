@@ -2,17 +2,17 @@ package com.mydoomsite.astreaserver.helpers;
 
 import com.mydoomsite.astreaserver.main.MainRegistry;
 
-import net.minecraft.command.CommandSource;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.network.chat.TextComponent;
 
 public final class CommandHelper
 {
-    public static boolean IsExecutedByServer(CommandSource src)
+    public static boolean IsExecutedByServer(CommandSourceStack src)
     {
         return src.hasPermission(4) && src.getTextName() == "Server";
     }
     
-    public static void LogCommandSuccess(CommandSource src, String text, boolean logToConsole, boolean informAdmins)
+    public static void LogCommandSuccess(CommandSourceStack src, String text, boolean logToConsole, boolean informAdmins)
     {
         if(logToConsole && !informAdmins && !IsExecutedByServer(src))
         {
@@ -27,11 +27,11 @@ public final class CommandHelper
             MainRegistry.Logger.info(consoleText);
         }
         
-        src.sendSuccess(new StringTextComponent(text + "\u00A7r"), informAdmins);
+        src.sendSuccess(new TextComponent(text + "\u00A7r"), informAdmins);
     }
     
-    public static void LogCommandFailure(CommandSource src, String text)
+    public static void LogCommandFailure(CommandSourceStack src, String text)
     {
-        src.sendFailure(new StringTextComponent(text + "\u00A7r"));
+        src.sendFailure(new TextComponent(text + "\u00A7r"));
     }
 }
